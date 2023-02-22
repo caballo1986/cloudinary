@@ -1,9 +1,21 @@
 <script lang="ts">
+  import {Cloudinary} from "@cloudinary/url-gen";
+  import {backgroundRemoval} from "@cloudinary/url-gen/actions/effect";
   import {ImageStatus} from "../types.d";
   import {imageStatus, originalImage} from "./store";
   import Dropzone from 'dropzone';
   import 'dropzone/dist/dropzone.css';
   import {onMount} from 'svelte';
+
+  const cloudinary = new Cloudinary({
+    cloud:{
+        cloudName: 'caballo'
+    },
+    url: {
+    secure: true
+    }
+  })
+
   onMount(() => {
     const dropzone = new Dropzone('#dropzone',{
         uploadMultiple: false,
@@ -18,7 +30,13 @@
         formData.append('api_key', '451584892192498');
     })
     dropzone.on('success', (file, response) => {
-        const {secure_url : url} = response;
+        const {public_id: publicId, secure_url : url} = response;
+        const imageWithoutBackground = cloudinary
+            .image(publicId)
+            .effect(backgroundRemoval())
+
+        imageWithoutBackground.toURL();
+        console.log("🚀 ~ file: StepUpload.svelte:38 ~ dropzone.on ~ imageWithoutBackground.toUrl();:", imageWithoutBackground.toURL());
         imageStatus.set(ImageStatus.DONE);
         originalImage.set(url);
         //crear un fondo transprarente y guardar en el backgroundImage
