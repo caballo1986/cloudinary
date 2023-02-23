@@ -1,8 +1,8 @@
 <script lang="ts">
-  import {Cloudinary} from "@cloudinary/url-gen";
-  import {backgroundRemoval} from "@cloudinary/url-gen/actions/effect";
+  import {Cloudinary} from '@cloudinary/url-gen';
+  import {backgroundRemoval} from '@cloudinary/url-gen/actions/effect';
   import {ImageStatus} from "../types.d";
-  import {imageStatus, originalImage} from "./store";
+  import {imageStatus, modifiedImage, originalImage} from "./store";
   import Dropzone from 'dropzone';
   import 'dropzone/dist/dropzone.css';
   import {onMount} from 'svelte';
@@ -12,7 +12,7 @@
         cloudName: 'caballo'
     },
     url: {
-    secure: true
+        secure: true
     }
   })
 
@@ -26,7 +26,7 @@
         imageStatus.set(ImageStatus.UPLOADING);
         //aqui podemos añadir la apikey, configuracion
         formData.append('upload_preset', 'default');
-        formData.append('timestamp', (Date.now()/1000));
+        formData.append('timestamp', Date.now()/1000);
         formData.append('api_key', '451584892192498');
     })
     dropzone.on('success', (file, response) => {
@@ -38,9 +38,10 @@
         imageWithoutBackground.toURL();
         console.log("🚀 ~ file: StepUpload.svelte:38 ~ dropzone.on ~ imageWithoutBackground.toUrl();:", imageWithoutBackground.toURL());
         imageStatus.set(ImageStatus.DONE);
-        originalImage.set(url);
+        modifiedImage.set(imageWithoutBackground.toURL());
+        originalImage.set(url); 
         //crear un fondo transprarente y guardar en el backgroundImage
-        console.log("🚀 HA SALIDO BIEN");   
+        console.log("🚀 HA SALIDO BIEN");
         console.log("🚀 ~ file: StepUpload.svelte:18 ~ dropzone.on ~ response:", response)
     })
     dropzone.on('error', (file, response) => {
